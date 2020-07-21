@@ -87,6 +87,11 @@ public class InventoryManager {
         }
     }
 
+    /**
+     * Replenish the cache for the given ingredient with the given quantity
+     * @param ingredient
+     * @param quantity
+     */
     public void refill(String ingredient, Integer quantity) {
         itemsQuantityCache.computeIfPresent(ingredient, (item, availableQuantity) -> availableQuantity + quantity);
         itemsQuantityCache.computeIfAbsent(ingredient, item -> quantity);

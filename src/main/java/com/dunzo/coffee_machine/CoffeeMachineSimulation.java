@@ -12,34 +12,17 @@ import java.net.URISyntaxException;
 import java.net.URL;
 import java.nio.file.Files;
 import java.nio.file.Paths;
+import java.util.List;
 import java.util.Map;
+import java.util.concurrent.ExecutionException;
 import java.util.stream.Collectors;
 
-/**
- * Class to start the execution of the coffee machine simulation application
- * <p>
- * Reads an input json file from the resources directory
- * <p>
- * input json needs to be of the following schema:
- * {
- * "machine": {
- * "outlets": {
- * "count_n": Integer
- * },
- * "total_items_quantity": JsonData, //String, Integer Pairs of the initial ingredients and quantity
- * "beverages": JsonArray, //each jsondata will contain name and String, Integer pair of the required ingredients and quantities
- * "refill_pack": JsonData (optional) ////String, Integer Pairs of the ingredients and quantity available for refill
- * }
- * }
- */
-public class Application {
+public class CoffeeMachineSimulation {
 
-    private static final Logger LOGGER = LoggerFactory.getLogger(Application.class);
+    private static final Logger LOGGER = LoggerFactory.getLogger(CoffeeMachineSimulation.class);
 
-    public static void main(String[] args) {
-        LOGGER.info("Application started...");
-
-        String inputFileName = "input.json";
+    public static List<OutletResponse> run(String[] args) {
+        String inputFileName = ApplicationConstants.DEFAULT_INPUT_FILE_NAME;
         if (args.length > 0 && args[0] != null && !args[0].trim().isEmpty())
             inputFileName = args[0];
         LOGGER.debug("Input File name = {}", inputFileName);
@@ -48,7 +31,7 @@ public class Application {
         LOGGER.debug("Loading {} file...", inputFileName);
         String inputJson;
         try {
-            URL resource = Application.class.getClassLoader().getResource(inputFileName);
+            URL resource = Main.class.getClassLoader().getResource(inputFileName);
             if (resource == null) {
                 LOGGER.error("Resource {} not found!", inputFileName);
                 throw new RuntimeException("Resource " + inputFileName + " not found!");
@@ -72,7 +55,7 @@ public class Application {
         CoffeeMachine coffeeMachine = MachineFactory.create(inputJson, objectMapper);
         LOGGER.info("Coffee Machine started!");
 
-        //fetch all the beverage orders to be served
+        //fetch all the beverage orders to be served from the input
         LOGGER.info("Getting all the beverage orders");
         Map<String, Map<String, Integer>> beverageOrders = null;
         try {
@@ -102,10 +85,16 @@ public class Application {
 
         //shutdown coffee machine
         LOGGER.info("Shutting down coffee machine...");
-        coffeeMachine.shutDown();
+        List<OutletResponse> results;
+        try {
+            results = coffeeMachine.shutDown();
+        } catch (ExecutionException | InterruptedException e) {
+            LOGGER.error("Error shutting down the coffee machine and getting the outlet responses!");
+            throw new RuntimeException("Error shutting down the Coffee Machine and getting the outlet responses", e);
+        }
         LOGGER.info("Coffee Machine shut down!");
 
-        LOGGER.info("Application finished!");
+        return results;
     }
 
     /**
@@ -117,9 +106,8 @@ public class Application {
      * @throws JsonProcessingException
      */
     private static Map<String, Map<String, Integer>> readBeverageTasks(String inputJson, ObjectMapper objectMapper) throws JsonProcessingException {
-        JsonNode beveragesNode = objectMapper.readTree(inputJson).get("machine").get("beverages");
+        JsonNode beveragesNode = objectMapper.readTree(inputJson).get(ApplicationConstants.MACHINE).get(ApplicationConstants.BEVERAGES);
         return objectMapper.convertValue(beveragesNode,
-                new TypeReference<Map<String, Map<String, Integer>>>() {
-                });
+                new TypeReference<Map<String, Map<String, Integer>>>() {});
     }
 }

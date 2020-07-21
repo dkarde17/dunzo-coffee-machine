@@ -1,6 +1,5 @@
 package com.dunzo.coffee_machine;
 
-import com.fasterxml.jackson.annotation.JsonProperty;
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.core.type.TypeReference;
 import com.fasterxml.jackson.databind.JsonNode;
@@ -15,6 +14,7 @@ import java.util.Map;
  */
 public class MachineFactory {
     private static final Logger LOGGER = LoggerFactory.getLogger(MachineFactory.class);
+
     public static CoffeeMachine create(String inputJson, ObjectMapper objectMapper) {
 
         //reading the json input
@@ -25,16 +25,17 @@ public class MachineFactory {
             LOGGER.error("Unable to parse json!");
             throw new RuntimeException("Unable to parse json!", e);
         }
-        JsonNode machine = input.get("machine");
-        Integer outlets = machine.get("outlets").get("count_n").intValue();
-        Map<String, Integer> itemsQuantity = objectMapper.convertValue(machine.get("total_items_quantity"),
+        JsonNode machine = input.get(ApplicationConstants.MACHINE);
+        Integer outlets = machine.get(ApplicationConstants.OUTLETS).get(ApplicationConstants.COUNT_N).intValue();
+        LOGGER.debug("Total number of outlets to be added to the coffee machine = {}", outlets);
+        Map<String, Integer> itemsQuantity = objectMapper.convertValue(machine.get(ApplicationConstants.TOTAL_ITEMS_QUANTITY),
                 new TypeReference<Map<String, Integer>>() {});
-
+        itemsQuantity.forEach((item, quantity) -> LOGGER.debug("Adding {} quantity of {} to the inventory manager",
+                quantity, item));
         //initializing the inventory manager
         InventoryManager inventoryManager = new InventoryManager(itemsQuantity);
         //creating the coffee machine with the given number of outlets and inventory manager
-        CoffeeMachine coffeeMachine = new CoffeeMachine(outlets, inventoryManager);
 
-        return coffeeMachine;
+        return new CoffeeMachine(outlets, inventoryManager);
     }
 }
