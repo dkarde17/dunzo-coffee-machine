@@ -14,7 +14,7 @@ public class AutomaticSimulationApplicationTest {
      */
     @Test
     public void allBeveragesAreMade() {
-        List<OutletResponse> results = CoffeeMachineSimulation.run(new String[]{"input1.json"});
+        List<OutletResponse> results = CoffeeMachineSimulation.run("input1.json");
 
         //asserting that both the beverages were prepared
         Assert.assertEquals(2, results.stream().filter(x -> x.wasBeveragePrepared()).count());
@@ -27,7 +27,7 @@ public class AutomaticSimulationApplicationTest {
      */
     @Test
     public void oneBeverageIsNotMadeBecauseOfInsufficientIngredients(){
-        List<OutletResponse> results = CoffeeMachineSimulation.run(new String[]{"input2.json"});
+        List<OutletResponse> results = CoffeeMachineSimulation.run("input2.json");
 
         //asserting that two beverages were prepared
         Assert.assertEquals(2, results.stream().filter(x -> x.wasBeveragePrepared()).count());
@@ -41,7 +41,7 @@ public class AutomaticSimulationApplicationTest {
      */
     @Test
     public void oneBeverageIsNotMadeBecauseOfMissingIngredients(){
-        List<OutletResponse> results = CoffeeMachineSimulation.run(new String[]{"input3.json"});
+        List<OutletResponse> results = CoffeeMachineSimulation.run("input3.json");
 
         //asserting that two beverages were prepared
         Assert.assertEquals(2, results.stream().filter(x -> x.wasBeveragePrepared()).count());
@@ -57,7 +57,7 @@ public class AutomaticSimulationApplicationTest {
      */
     @Test
     public void allBeveragesArePreparedBecauseOfTheRefill(){
-        List<OutletResponse> results = CoffeeMachineSimulation.run(new String[]{"input4.json"});
+        List<OutletResponse> results = CoffeeMachineSimulation.run("input4.json");
 
         //asserting that all 4 beverages were prepared as a result of the refill
         Assert.assertEquals(4, results.stream().filter(x -> x.wasBeveragePrepared()).count());

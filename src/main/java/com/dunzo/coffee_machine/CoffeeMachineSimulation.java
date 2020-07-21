@@ -21,11 +21,7 @@ public class CoffeeMachineSimulation {
 
     private static final Logger LOGGER = LoggerFactory.getLogger(CoffeeMachineSimulation.class);
 
-    public static List<OutletResponse> run(String[] args) {
-        String inputFileName = ApplicationConstants.DEFAULT_INPUT_FILE_NAME;
-        if (args.length > 0 && args[0] != null && !args[0].trim().isEmpty())
-            inputFileName = args[0];
-        LOGGER.debug("Input File name = {}", inputFileName);
+    public static List<OutletResponse> run(String inputFileName) {
 
         //read the input json file to initialize parameters like number of outlets, initial ingredients, etc.
         LOGGER.debug("Loading {} file...", inputFileName);

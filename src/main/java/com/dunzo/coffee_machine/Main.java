@@ -33,7 +33,12 @@ public class Main {
     public static void main(String[] args) {
         LOGGER.info("Application started...");
 
-        CoffeeMachineSimulation.run(args);
+        String inputFileName = ApplicationConstants.DEFAULT_INPUT_FILE_NAME;
+        if (args.length > 0 && args[0] != null && !args[0].trim().isEmpty())
+            inputFileName = args[0];
+        LOGGER.debug("Input File name = {}", inputFileName);
+
+        CoffeeMachineSimulation.run(inputFileName);
 
         LOGGER.info("Application finished!");
     }
