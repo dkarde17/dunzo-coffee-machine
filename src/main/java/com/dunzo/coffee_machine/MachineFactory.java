@@ -15,10 +15,9 @@ import java.util.Map;
  */
 public class MachineFactory {
     private static final Logger LOGGER = LoggerFactory.getLogger(MachineFactory.class);
-    public static CoffeeMachine create(String inputJson) {
+    public static CoffeeMachine create(String inputJson, ObjectMapper objectMapper) {
 
         //reading the json input
-        ObjectMapper objectMapper = new ObjectMapper();
         JsonNode input = null;
         try {
             input = objectMapper.readTree(inputJson);
